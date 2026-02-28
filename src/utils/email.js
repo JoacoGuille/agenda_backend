@@ -2,28 +2,19 @@ import "../config/env.js";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,        
-  secure: true,       
+  host: "smtp.resend.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  family: 4           
-});
-
-transporter.verify((error) => {
-  if (error) {
-    console.error("SMTP connection error:", error.message);
-  } else {
-    console.log("SMTP listo");
+    user: "resend",
+    pass: process.env.RESEND_API_KEY
   }
 });
 
 export const sendEmail = async ({ to, subject, html }) => {
   try {
     await transporter.sendMail({
-      from: `"U-Proyect Team" <${process.env.EMAIL_USER}>`,
+      from: "U-Proyect <onboarding@resend.dev>",
       to,
       subject,
       html

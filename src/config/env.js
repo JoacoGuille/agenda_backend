@@ -24,8 +24,7 @@ const requiredVars = [
   "MONGO_URI",
   "JWT_SECRET",
   "JWT_EXPIRES_IN",
-  "EMAIL_USER",
-  "EMAIL_PASS"
+  "RESEND_API_KEY"
 ];
 
 if (isProd) {
