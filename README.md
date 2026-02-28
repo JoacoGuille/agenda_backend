@@ -6,7 +6,7 @@ Backend REST para Up Agenda. La idea es simple: el front le pega a esta API con 
 - Node.js + Express
 - MongoDB + Mongoose
 - JWT
-- Nodemailer
+- Resend (emails)
 
 **Instalacion y ejecucion**
 1. Clona el repo.
@@ -34,8 +34,8 @@ npm start
 - `MONGO_URI`
 - `JWT_SECRET`
 - `JWT_EXPIRES_IN`
-- `EMAIL_USER`
-- `EMAIL_PASS`
+- `RESEND_API_KEY`
+- `RESEND_FROM`
 - `FRONTEND_URL`
 - `APP_URL`
 - `API_URL`
@@ -171,6 +171,8 @@ Ejemplo de envs en produccion:
 FRONTEND_URL=https://tu-frontend.vercel.app
 APP_URL=https://tu-frontend.vercel.app
 API_URL=https://tu-backend.onrender.com
+RESEND_API_KEY=tu_api_key
+RESEND_FROM=Up Agenda <no-reply@tu-dominio.com>
 ```
 
 Railway es parecido: servis new, set envs, build `npm install`, start `npm start`.
