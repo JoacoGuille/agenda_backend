@@ -21,9 +21,15 @@ connectDB();
 
 const isProd = process.env.NODE_ENV === "production";
 if (isProd) {
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    "http://localhost:5173"
+  ].filter(Boolean);
+
   app.use(
     cors({
-      origin: process.env.FRONTEND_URL,
+      origin: allowedOrigins,
+      methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true
     })
   );
