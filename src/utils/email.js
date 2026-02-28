@@ -5,15 +5,16 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendEmail = async ({ to, subject, html }) => {
   try {
-    await resend.emails.send({
-      from: "U-Proyect <onboarding@resend.dev>",
+    const response = await resend.emails.send({
+      from: "U-Proyect <Support@uproyect.com>",
       to,
       subject,
       html
     });
-    console.log("Email enviado correctamente");
+
+    console.log("Email enviado:", response);
   } catch (error) {
-    console.error("Email delivery error:", error.message);
+    console.error("Email delivery error:", error);
     throw error;
   }
 };
