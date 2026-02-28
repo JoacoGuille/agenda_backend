@@ -107,10 +107,12 @@ export const resendVerification = async (req, res) => {
       `http://localhost:${process.env.PORT || 4000}`;
     const verificationLink = `${frontendBaseUrl}/verify?token=${token}`;
 
-    await sendEmail({
+    sendEmail({
       to: user.email,
       subject: "Confirmá tu cuenta en U-Proyect",
       html: buildVerificationEmail({ name: user.name, url: verificationLink })
+    }).catch((err) => {
+      console.error("Error enviando email:", err.message);
     });
 
     res.json({ message: "Email de verificación reenviado" });
