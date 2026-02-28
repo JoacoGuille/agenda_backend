@@ -11,6 +11,7 @@ export const sendEmail = async ({ to, subject, html }) => {
       subject,
       html
     });
+    console.log("Email enviado correctamente");
   } catch (error) {
     console.error("Email delivery error:", error.message);
     throw error;
