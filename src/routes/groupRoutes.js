@@ -5,7 +5,9 @@ import {
   createInviteLink,
   deleteGroup,
   getGroupById,
+  getGroupInvites,
   getGroups,
+  inviteToGroup,
   updateGroup
 } from "../controllers/groupController.js";
 
@@ -18,5 +20,7 @@ router.post("/", createGroup);
 router.put("/:id", updateGroup);
 router.delete("/:id", deleteGroup);
 router.post("/:id/invite-link", createInviteLink);
+router.post("/:id/invite", inviteToGroup);
+router.get("/:id/invites", getGroupInvites);
 
 export default router;

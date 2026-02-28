@@ -1,0 +1,286 @@
+{
+  "info": {
+    "name": "Up Agenda Backend",
+    "_postman_id": "6f7b5d55-4b7a-4b9b-9c62-2b4a8e9fb8c1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Joaquin\",\"email\":\"joaquin@mail.com\",\"password\":\"123456\"}"
+        },
+        "url": "{{baseUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "Auth - Verify Email",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/auth/verify-email?token={{verifyToken}}"
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"joaquin@mail.com\",\"password\":\"123456\"}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Auth - Forgot Password",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"email\":\"joaquin@mail.com\"}" },
+        "url": "{{baseUrl}}/auth/forgot-password"
+      }
+    },
+    {
+      "name": "Auth - Reset Password",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"token\":\"{{resetToken}}\",\"newPassword\":\"123456\"}"
+        },
+        "url": "{{baseUrl}}/auth/reset-password"
+      }
+    },
+    {
+      "name": "Auth - Resend Verification",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"email\":\"joaquin@mail.com\"}" },
+        "url": "{{baseUrl}}/auth/resend-verification"
+      }
+    },
+    {
+      "name": "Events - List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/events"
+      }
+    },
+    {
+      "name": "Events - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\":\"Clase React\",\"description\":\"Intro\",\"startAt\":\"2026-03-02T09:30:00Z\",\"endAt\":\"2026-03-02T11:00:00Z\"}"
+        },
+        "url": "{{baseUrl}}/events"
+      }
+    },
+    {
+      "name": "Events - Update",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\"title\":\"Clase React 2\"}" },
+        "url": "{{baseUrl}}/events/{{eventId}}"
+      }
+    },
+    {
+      "name": "Events - Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/events/{{eventId}}"
+      }
+    },
+    {
+      "name": "Categories - List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/categories"
+      }
+    },
+    {
+      "name": "Categories - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Clases\",\"description\":\"Materias\",\"color\":\"#5B7CFA\"}"
+        },
+        "url": "{{baseUrl}}/categories"
+      }
+    },
+    {
+      "name": "Dashboard - Summary",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/dashboard/summary"
+      }
+    },
+    {
+      "name": "Notifications - List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/notifications"
+      }
+    },
+    {
+      "name": "Notifications - Accept",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/notifications/{{notificationId}}/accept"
+      }
+    },
+    {
+      "name": "Notifications - Reject",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/notifications/{{notificationId}}/reject"
+      }
+    },
+    {
+      "name": "Notifications - Mark All Read",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/notifications/mark-all-read"
+      }
+    },
+    {
+      "name": "Friends - List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/friends"
+      }
+    },
+    {
+      "name": "Friends - Invite",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\"email\":\"amigo@mail.com\"}" },
+        "url": "{{baseUrl}}/friends/invite"
+      }
+    },
+    {
+      "name": "Friends - Accept",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\"requestId\":\"{{requestId}}\"}" },
+        "url": "{{baseUrl}}/friends/accept"
+      }
+    },
+    {
+      "name": "Friends - Reject",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\"requestId\":\"{{requestId}}\"}" },
+        "url": "{{baseUrl}}/friends/reject"
+      }
+    },
+    {
+      "name": "Groups - List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/groups"
+      }
+    },
+    {
+      "name": "Groups - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\"name\":\"TP Sistemas\"}" },
+        "url": "{{baseUrl}}/groups"
+      }
+    },
+    {
+      "name": "Groups - Invite Link",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/groups/{{groupId}}/invite-link"
+      }
+    },
+    {
+      "name": "Groups - Invite User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\"email\":\"amigo@mail.com\"}" },
+        "url": "{{baseUrl}}/groups/{{groupId}}/invite"
+      }
+    },
+    {
+      "name": "Groups - Invites List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/groups/{{groupId}}/invites"
+      }
+    },
+    {
+      "name": "Search",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/search?q=clase"
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "token", "value": "" },
+    { "key": "eventId", "value": "" },
+    { "key": "groupId", "value": "" },
+    { "key": "notificationId", "value": "" },
+    { "key": "requestId", "value": "" },
+    { "key": "verifyToken", "value": "" },
+    { "key": "resetToken", "value": "" }
+  ]
+}
