@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import mongoose from "mongoose";
 import Group from "../models/Group.js";
 import Notification from "../models/Notification.js";
 import User from "../models/User.js";
@@ -7,6 +8,14 @@ const buildInviteLink = (token, groupId) => {
   const baseUrl =
     process.env.APP_URL || process.env.API_URL || "http://localhost:4000";
   return `${baseUrl}/grupos/join?token=${token}&groupId=${groupId}`;
+};
+
+const resolveGroupId = (value) => {
+  const id = (value ?? "").toString().trim();
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    return null;
+  }
+  return id;
 };
 
 const withId = (doc) => {
@@ -121,13 +130,19 @@ export const createGroup = async (req, res, next) => {
 
 export const updateGroup = async (req, res, next) => {
   try {
-    const group = await Group.findOne({
-      _id: req.params.id,
-      owner: req.user.id
-    });
+    const groupId = resolveGroupId(req.params.id);
+    if (!groupId) {
+      return res.status(404).json({ message: "Grupo no encontrado" });
+    }
+
+    const group = await Group.findById(groupId);
 
     if (!group) {
       return res.status(404).json({ message: "Grupo no encontrado" });
+    }
+
+    if (group.owner?.toString?.() !== req.user.id) {
+      return res.status(403).json({ message: "No autorizado" });
     }
 
     const { name, description } = req.body;
@@ -143,14 +158,22 @@ export const updateGroup = async (req, res, next) => {
 
 export const deleteGroup = async (req, res, next) => {
   try {
-    const group = await Group.findOneAndDelete({
-      _id: req.params.id,
-      owner: req.user.id
-    });
+    const groupId = resolveGroupId(req.params.id);
+    if (!groupId) {
+      return res.status(404).json({ message: "Grupo no encontrado" });
+    }
+
+    const group = await Group.findById(groupId);
 
     if (!group) {
       return res.status(404).json({ message: "Grupo no encontrado" });
     }
+
+    if (group.owner?.toString?.() !== req.user.id) {
+      return res.status(403).json({ message: "No autorizado" });
+    }
+
+    await Group.deleteOne({ _id: groupId });
 
     res.json({ message: "Grupo eliminado" });
   } catch (error) {
