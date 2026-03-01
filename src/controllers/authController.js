@@ -8,17 +8,16 @@ import {
 export const register = async (req, res) => {
   try {
     const { user, token } = await authService.registerUser(req.body);
-
-    const frontendBaseUrl =
-      process.env.FRONTEND_URL ||
-      process.env.APP_URL ||
-      `http://localhost:${process.env.PORT || 4000}`;
+    const frontendBaseUrl = process.env.FRONTEND_URL;
     const verificationLink = `${frontendBaseUrl}/verify?token=${token}`;
 
     await sendEmail({
       to: user.email,
       subject: "Confirmá tu cuenta en U-Proyect",
-      html: buildVerificationEmail({ name: user.name, url: verificationLink })
+      html: buildVerificationEmail({
+        name: user.name,
+        url: verificationLink
+      })
     });
 
     res.status(201).json({
@@ -56,12 +55,7 @@ export const login = async (req, res) => {
 export const forgot = async (req, res) => {
   try {
     const resetToken = await authService.forgotPassword(req.body.email);
-
-    const appBaseUrl =
-      process.env.APP_URL ||
-      process.env.API_URL ||
-      `http://localhost:${process.env.PORT || 4000}`;
-    const resetLink = `${appBaseUrl}/reset?token=${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
     await sendEmail({
       to: req.body.email,
