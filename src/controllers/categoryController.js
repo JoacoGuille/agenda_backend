@@ -1,11 +1,20 @@
 import Category from "../models/Category.js";
 
+const withId = (doc) => {
+  if (!doc) return doc;
+  const payload = doc.toObject ? doc.toObject() : { ...doc };
+  if (!payload.id && payload._id) {
+    payload.id = payload._id.toString();
+  }
+  return payload;
+};
+
 export const getAllCategories = async (req, res, next) => {
   try {
     const categories = await Category.find({ user: req.user.id }).sort({
       createdAt: -1
     });
-    res.json(categories);
+    res.json(categories.map(withId));
   } catch (error) {
     next(error);
   }
@@ -20,7 +29,7 @@ export const getCategoryById = async (req, res, next) => {
     if (!category) {
       return res.status(404).json({ message: "Categoría no encontrada" });
     }
-    res.json(category);
+    res.json(withId(category));
   } catch (error) {
     next(error);
   }
@@ -40,7 +49,7 @@ export const createCategory = async (req, res, next) => {
       user: req.user.id
     });
 
-    res.status(201).json(category);
+    res.status(201).json(withId(category));
   } catch (error) {
     next(error);
   }
@@ -59,7 +68,7 @@ export const updateCategory = async (req, res, next) => {
       return res.status(404).json({ message: "Categoría no encontrada" });
     }
 
-    res.json(category);
+    res.json(withId(category));
   } catch (error) {
     next(error);
   }

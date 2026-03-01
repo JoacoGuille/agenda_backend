@@ -1,5 +1,4 @@
 import express from "express";
-import { authMiddleware } from "../middleware/authMiddleware.js";
 import {
   createGroup,
   createInviteLink,
@@ -11,14 +10,16 @@ import {
   joinGroupByToken,
   updateGroup
 } from "../controllers/groupController.js";
+import { authMiddleware, optionalAuthMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+router.get("/join", joinGroupByToken);
+router.get("/:id", optionalAuthMiddleware, getGroupById);
+
 router.use(authMiddleware);
 router.get("/", getGroups);
-router.get("/join", joinGroupByToken);
 router.post("/join", joinGroupByToken);
-router.get("/:id", getGroupById);
 router.post("/", createGroup);
 router.put("/:id", updateGroup);
 router.delete("/:id", deleteGroup);
