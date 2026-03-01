@@ -1,20 +1,15 @@
-import Category from "../models/Category.js";
-
-const withId = (doc) => {
-  if (!doc) return doc;
-  const payload = doc.toObject ? doc.toObject() : { ...doc };
-  if (!payload.id && payload._id) {
-    payload.id = payload._id.toString();
-  }
-  return payload;
-};
+import {
+  createCategoryForUser,
+  deleteCategoryForUserById,
+  getAllCategories as getAllCategoriesService,
+  getCategoryById as getCategoryByIdService,
+  updateCategoryForUserById
+} from "../services/categoryService.js";
 
 export const getAllCategories = async (req, res, next) => {
   try {
-    const categories = await Category.find({ user: req.user.id }).sort({
-      createdAt: -1
-    });
-    res.json(categories.map(withId));
+    const categories = await getAllCategoriesService(req.user.id);
+    res.json(categories);
   } catch (error) {
     next(error);
   }
@@ -22,14 +17,8 @@ export const getAllCategories = async (req, res, next) => {
 
 export const getCategoryById = async (req, res, next) => {
   try {
-    const category = await Category.findOne({
-      _id: req.params.id,
-      user: req.user.id
-    });
-    if (!category) {
-      return res.status(404).json({ message: "Categoría no encontrada" });
-    }
-    res.json(withId(category));
+    const category = await getCategoryByIdService(req.user.id, req.params.id);
+    res.json(category);
   } catch (error) {
     next(error);
   }
@@ -37,19 +26,8 @@ export const getCategoryById = async (req, res, next) => {
 
 export const createCategory = async (req, res, next) => {
   try {
-    const { name, description = "", color = "#5B7CFA" } = req.body;
-    if (!name) {
-      return res.status(400).json({ message: "El nombre es obligatorio" });
-    }
-
-    const category = await Category.create({
-      name,
-      description,
-      color,
-      user: req.user.id
-    });
-
-    res.status(201).json(withId(category));
+    const category = await createCategoryForUser(req.user.id, req.body);
+    res.status(201).json(category);
   } catch (error) {
     next(error);
   }
@@ -57,18 +35,12 @@ export const createCategory = async (req, res, next) => {
 
 export const updateCategory = async (req, res, next) => {
   try {
-    const { name, description, color } = req.body;
-    const category = await Category.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.id },
-      { name, description, color },
-      { new: true, runValidators: true }
+    const category = await updateCategoryForUserById(
+      req.user.id,
+      req.params.id,
+      req.body
     );
-
-    if (!category) {
-      return res.status(404).json({ message: "Categoría no encontrada" });
-    }
-
-    res.json(withId(category));
+    res.json(category);
   } catch (error) {
     next(error);
   }
@@ -76,14 +48,8 @@ export const updateCategory = async (req, res, next) => {
 
 export const deleteCategory = async (req, res, next) => {
   try {
-    const category = await Category.findOneAndDelete({
-      _id: req.params.id,
-      user: req.user.id
-    });
-    if (!category) {
-      return res.status(404).json({ message: "Categoría no encontrada" });
-    }
-    res.json({ message: "Categoría eliminada" });
+    const result = await deleteCategoryForUserById(req.user.id, req.params.id);
+    res.json(result);
   } catch (error) {
     next(error);
   }

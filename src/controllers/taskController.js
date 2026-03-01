@@ -1,8 +1,8 @@
-import Task from "../models/Task.js";
+import { createTaskForUser, getAllTasks as getAllTasksService } from "../services/taskService.js";
 
 export const getAllTasks = async (req, res, next) => {
   try {
-    const tasks = await Task.find({ user: req.user.id }).sort({ createdAt: -1 });
+    const tasks = await getAllTasksService(req.user.id);
     res.json(tasks);
   } catch (error) {
     next(error);
@@ -11,15 +11,7 @@ export const getAllTasks = async (req, res, next) => {
 
 export const createTask = async (req, res, next) => {
   try {
-    const { title, description } = req.body;
-    if (!title) {
-      return res.status(400).json({ message: "El título es obligatorio" });
-    }
-    const task = await Task.create({
-      title,
-      description,
-      user: req.user.id
-    });
+    const task = await createTaskForUser(req.user.id, req.body);
     res.status(201).json(task);
   } catch (error) {
     next(error);
