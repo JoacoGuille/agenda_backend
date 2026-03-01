@@ -18,12 +18,43 @@ const withId = (doc) => {
   return payload;
 };
 
+const toUserPayload = (user) => {
+  if (!user) return null;
+  if (typeof user === "string") return user;
+  const hasProfile = user.name || user.email || user._id || user.id;
+  if (!hasProfile) {
+    return typeof user.toString === "function" ? user.toString() : user;
+  }
+  return {
+    id: user._id?.toString?.() ?? user.id,
+    _id: user._id ?? user.id,
+    name: user.name,
+    email: user.email
+  };
+};
+
+const withMembers = (group) => {
+  const payload = withId(group);
+  if (payload && Array.isArray(payload.members)) {
+    payload.members = payload.members.map((member) =>
+      member && typeof member === "object" ? toUserPayload(member) : member
+    );
+  }
+  if (payload?.owner && typeof payload.owner === "object") {
+    payload.owner = toUserPayload(payload.owner);
+  }
+  return payload;
+};
+
 export const getGroups = async (req, res, next) => {
   try {
     const groups = await Group.find({
       $or: [{ owner: req.user.id }, { members: req.user.id }]
-    }).sort({ createdAt: -1 });
-    res.json(groups.map(withId));
+    })
+      .sort({ createdAt: -1 })
+      .populate("members", "name email")
+      .populate("owner", "name email");
+    res.json(groups.map(withMembers));
   } catch (error) {
     next(error);
   }
@@ -37,7 +68,9 @@ export const getGroupById = async (req, res, next) => {
       group = await Group.findOne({
         _id: groupId,
         $or: [{ owner: req.user.id }, { members: req.user.id }]
-      });
+      })
+        .populate("members", "name email")
+        .populate("owner", "name email");
     }
     if (!group) {
       const token = (req.query.token ?? req.query.inviteToken ?? "")
@@ -50,15 +83,17 @@ export const getGroupById = async (req, res, next) => {
       const invitedGroup = await Group.findOne({
         _id: groupId,
         inviteToken: token
-      });
+      })
+        .populate("members", "name email")
+        .populate("owner", "name email");
 
       if (!invitedGroup) {
         return res.status(404).json({ message: "Grupo no encontrado" });
       }
 
-      return res.json(withId(invitedGroup));
+      return res.json(withMembers(invitedGroup));
     }
-    res.json(withId(group));
+    res.json(withMembers(group));
   } catch (error) {
     next(error);
   }
@@ -263,14 +298,16 @@ export const joinGroupByToken = async (req, res, next) => {
         .json({ message: "Token y grupo son obligatorios" });
     }
 
-    const group = await Group.findOne({ _id: groupId, inviteToken: token });
+    const group = await Group.findOne({ _id: groupId, inviteToken: token })
+      .populate("members", "name email")
+      .populate("owner", "name email");
 
     if (!group) {
       return res.status(404).json({ message: "Grupo no encontrado" });
     }
 
     if (!req.user?.id) {
-      return res.json({ ...withId(group), joinRequired: true });
+      return res.json({ ...withMembers(group), joinRequired: true });
     }
 
     await Group.updateOne(
@@ -278,8 +315,10 @@ export const joinGroupByToken = async (req, res, next) => {
       { $addToSet: { members: req.user.id } }
     );
 
-    const updated = await Group.findById(group._id);
-    res.json(withId(updated));
+    const updated = await Group.findById(group._id)
+      .populate("members", "name email")
+      .populate("owner", "name email");
+    res.json(withMembers(updated));
   } catch (error) {
     next(error);
   }
