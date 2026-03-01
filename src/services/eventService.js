@@ -58,6 +58,12 @@ const parseDateTimeString = (value) => {
   const trimmed = value.trim();
   if (!trimmed) return null;
 
+  if (/^\d+$/.test(trimmed)) {
+    const numeric = Number(trimmed);
+    const date = new Date(numeric);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
   const direct = new Date(trimmed);
   if (!Number.isNaN(direct.getTime())) {
     return direct;
@@ -75,6 +81,11 @@ const parseDateTimeString = (value) => {
   }
 
   return null;
+};
+
+const hasTimePart = (value) => {
+  if (typeof value !== "string") return false;
+  return /[ T]\d{2}:\d{2}/.test(value);
 };
 
 const buildDateTimeFromParts = (dateValue, timeValue) => {
@@ -149,8 +160,15 @@ export const getEventsForUser = async (userId, query) => {
   }
 
   if (from || to) {
-    const fromDate = from ? new Date(from) : null;
-    const toDate = to ? new Date(to) : null;
+    const fromDate = from ? parseDateTimeString(from) : null;
+    const toDate = to ? parseDateTimeString(to) : null;
+
+    if (fromDate && !hasTimePart(from)) {
+      fromDate.setHours(0, 0, 0, 0);
+    }
+    if (toDate && !hasTimePart(to)) {
+      toDate.setHours(23, 59, 59, 999);
+    }
 
     if (fromDate && toDate) {
       filter.$and = [
