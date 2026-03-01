@@ -8,6 +8,7 @@ import {
   getGroupInvites,
   getGroups,
   inviteToGroup,
+  joinGroupByToken,
   updateGroup
 } from "../controllers/groupController.js";
 
@@ -15,6 +16,8 @@ const router = express.Router();
 
 router.use(authMiddleware);
 router.get("/", getGroups);
+router.get("/join", joinGroupByToken);
+router.post("/join", joinGroupByToken);
 router.get("/:id", getGroupById);
 router.post("/", createGroup);
 router.put("/:id", updateGroup);

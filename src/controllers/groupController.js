@@ -9,10 +9,21 @@ const buildInviteLink = (token, groupId) => {
   return `${baseUrl}/grupos/join?token=${token}&groupId=${groupId}`;
 };
 
+const withId = (doc) => {
+  if (!doc) return doc;
+  const payload = doc.toObject ? doc.toObject() : { ...doc };
+  if (!payload.id && payload._id) {
+    payload.id = payload._id.toString();
+  }
+  return payload;
+};
+
 export const getGroups = async (req, res, next) => {
   try {
-    const groups = await Group.find({ members: req.user.id }).sort({ createdAt: -1 });
-    res.json(groups);
+    const groups = await Group.find({
+      $or: [{ owner: req.user.id }, { members: req.user.id }]
+    }).sort({ createdAt: -1 });
+    res.json(groups.map(withId));
   } catch (error) {
     next(error);
   }
@@ -22,12 +33,12 @@ export const getGroupById = async (req, res, next) => {
   try {
     const group = await Group.findOne({
       _id: req.params.id,
-      members: req.user.id
+      $or: [{ owner: req.user.id }, { members: req.user.id }]
     });
     if (!group) {
       return res.status(404).json({ message: "Grupo no encontrado" });
     }
-    res.json(group);
+    res.json(withId(group));
   } catch (error) {
     next(error);
   }
@@ -47,7 +58,7 @@ export const createGroup = async (req, res, next) => {
       members: [req.user.id]
     });
 
-    res.status(201).json(group);
+    res.status(201).json(withId(group));
   } catch (error) {
     next(error);
   }
@@ -69,7 +80,7 @@ export const updateGroup = async (req, res, next) => {
     if (description !== undefined) group.description = description;
 
     await group.save();
-    res.json(group);
+    res.json(withId(group));
   } catch (error) {
     next(error);
   }
@@ -96,7 +107,7 @@ export const createInviteLink = async (req, res, next) => {
   try {
     const group = await Group.findOne({
       _id: req.params.id,
-      members: req.user.id
+      $or: [{ owner: req.user.id }, { members: req.user.id }]
     });
 
     if (!group) {
@@ -119,7 +130,7 @@ export const inviteToGroup = async (req, res, next) => {
 
     const group = await Group.findOne({
       _id: req.params.id,
-      members: req.user.id
+      $or: [{ owner: req.user.id }, { members: req.user.id }]
     });
 
     if (!group) {
@@ -171,7 +182,7 @@ export const getGroupInvites = async (req, res, next) => {
   try {
     const group = await Group.findOne({
       _id: req.params.id,
-      members: req.user.id
+      $or: [{ owner: req.user.id }, { members: req.user.id }]
     });
 
     if (!group) {
@@ -209,6 +220,35 @@ export const getGroupInvites = async (req, res, next) => {
     }));
 
     res.json(payload);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const joinGroupByToken = async (req, res, next) => {
+  try {
+    const token = req.body.token ?? req.query.token;
+    const groupId = req.body.groupId ?? req.query.groupId ?? req.body.id;
+
+    if (!token || !groupId) {
+      return res
+        .status(400)
+        .json({ message: "Token y grupo son obligatorios" });
+    }
+
+    const group = await Group.findOne({ _id: groupId, inviteToken: token });
+
+    if (!group) {
+      return res.status(404).json({ message: "Grupo no encontrado" });
+    }
+
+    await Group.updateOne(
+      { _id: group._id },
+      { $addToSet: { members: req.user.id } }
+    );
+
+    const updated = await Group.findById(group._id);
+    res.json(withId(updated));
   } catch (error) {
     next(error);
   }

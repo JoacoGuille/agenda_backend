@@ -1,5 +1,13 @@
+import mongoose from "mongoose";
 import Notification from "../models/Notification.js";
 import User from "../models/User.js";
+
+const toFriendPayload = (friend) => ({
+  id: friend._id?.toString?.() ?? friend.id,
+  _id: friend._id ?? friend.id,
+  name: friend.name,
+  email: friend.email
+});
 
 const areAlreadyFriends = async (userId, friendId) => {
   const user = await User.findOne({
@@ -15,7 +23,35 @@ export const getFriends = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
-    res.json(user.friends || []);
+    const friends = (user.friends || []).map((friend) => toFriendPayload(friend));
+    res.json(friends);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getFriendById = async (req, res, next) => {
+  try {
+    const friendId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(friendId)) {
+      return res.status(404).json({ message: "Amigo no encontrado" });
+    }
+
+    const relationship = await User.findOne({
+      _id: req.user.id,
+      friends: friendId
+    }).select("_id");
+
+    if (!relationship) {
+      return res.status(404).json({ message: "Amigo no encontrado" });
+    }
+
+    const friend = await User.findById(friendId).select("name email");
+    if (!friend) {
+      return res.status(404).json({ message: "Amigo no encontrado" });
+    }
+
+    res.json(toFriendPayload(friend));
   } catch (error) {
     next(error);
   }
