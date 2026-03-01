@@ -247,8 +247,13 @@ export const getGroupInvites = async (req, res, next) => {
 
 export const joinGroupByToken = async (req, res, next) => {
   try {
-    const token = (req.body.token ?? req.query.token ?? "").toString().trim();
-    const groupId = (req.body.groupId ?? req.query.groupId ?? req.body.id ?? "")
+    const token = (req.body?.token ?? req.query.token ?? "").toString().trim();
+    const groupId = (
+      req.body?.groupId ??
+      req.query.groupId ??
+      req.body?.id ??
+      ""
+    )
       .toString()
       .trim();
 
